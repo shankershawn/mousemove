@@ -17,6 +17,10 @@ import com.shankarsan.mousemove.runners.ProgressUIRunner;
  */
 public class MouseMove {
 	
+	static {
+		System.setProperty("java.awt.headless", "false");
+	}
+	
 	/**
 	 * @param args
 	 */
