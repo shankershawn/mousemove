@@ -42,7 +42,7 @@ public class MouseMove {
 				scanner.close();
 				System.out.println("Exiting mouse move execution!");
 			}else {
-				System.out.println("Invalid parameters! Exiting");
+				System.out.println("Invalid parameters! Please try again with java -jar <jarname>.jar <milliseconds> or in case of docker then, docker run -tid shankershawn/mousemove <milliseconds>");
 				Thread.sleep(2000);
 			}
 		} catch (Exception e) {
