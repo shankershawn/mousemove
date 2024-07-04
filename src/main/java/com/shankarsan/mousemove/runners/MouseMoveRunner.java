@@ -3,11 +3,7 @@
  */
 package com.shankarsan.mousemove.runners;
 
-import java.awt.AWTException;
-import java.awt.HeadlessException;
-import java.awt.MouseInfo;
-import java.awt.Point;
-import java.awt.Robot;
+import java.awt.*;
 
 /**
  * @author SHANKARSAN
@@ -25,9 +21,10 @@ public class MouseMoveRunner implements Runnable {
     public void run() {
         Point point = null;
         int x = 0, y = 0, counter = 0;
-        try {
-            Robot robot = new Robot();
-            while (!exit) {
+        Robot robot;
+        while (!exit) {
+            try {
+                robot = new Robot();
                 point = MouseInfo.getPointerInfo().getLocation();
                 x = (int) point.getX();
                 y = (int) point.getY();
@@ -36,17 +33,18 @@ public class MouseMoveRunner implements Runnable {
                 else {
                     x -= 1;
                 }
-				if (counter == 0 || counter == 1)
-					y += 1;
-				else
-					y -= 1;
+                if (counter == 0 || counter == 1)
+                    y += 1;
+                else
+                    y -= 1;
                 robot.mouseMove(x, y);
                 Thread.sleep(millis);
                 counter++;
                 if (counter > 3) counter = 0;
+
+            } catch (HeadlessException | InterruptedException | AWTException e) {
+                e.printStackTrace();
             }
-        } catch (HeadlessException | InterruptedException | AWTException e) {
-            e.printStackTrace();
         }
     }
 
