@@ -10,11 +10,13 @@ import java.awt.*;
  */
 public class MouseMoveRunner implements Runnable {
 
-    private int millis;
+    private final int millis;
+    private final Thread parentThread;
     private volatile boolean exit = false;
 
-    public MouseMoveRunner(int millis) {
+    public MouseMoveRunner(int millis, Thread parentThread) {
         this.millis = millis;
+        this.parentThread = parentThread;
     }
 
     @Override
@@ -42,9 +44,13 @@ public class MouseMoveRunner implements Runnable {
                 counter++;
                 if (counter > 3) counter = 0;
 
-            } catch (HeadlessException | InterruptedException | AWTException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
+                stop();
             }
+        }
+        synchronized (parentThread) {
+            parentThread.notify();
         }
     }
 
