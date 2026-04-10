@@ -11,12 +11,11 @@ import java.awt.*;
 public class MouseMoveRunner implements Runnable {
 
     private final int millis;
-    private final Thread parentThread;
+    private volatile boolean failed = false;
     private volatile boolean exit = false;
 
-    public MouseMoveRunner(int millis, Thread parentThread) {
+    public MouseMoveRunner(int millis) {
         this.millis = millis;
-        this.parentThread = parentThread;
     }
 
     @Override
@@ -46,12 +45,21 @@ public class MouseMoveRunner implements Runnable {
 
             } catch (Exception e) {
                 e.printStackTrace();
+                fail();
                 stop();
             }
         }
-        synchronized (parentThread) {
-            parentThread.notify();
+        synchronized (this) {
+            notify();
         }
+    }
+
+    public boolean isFailed() {
+        return this.failed;
+    }
+
+    private void fail() {
+        this.failed = true;
     }
 
     public void stop() {

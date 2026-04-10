@@ -9,11 +9,6 @@ package com.shankarsan.mousemove.runners;
  */
 public class ProgressUIRunner implements Runnable {
   private volatile boolean exit = false;
-  private final Thread parentThread;
-
-  public ProgressUIRunner(Thread parentThread) {
-    this.parentThread = parentThread;
-  }
 
   @Override
   public void run() {
@@ -31,8 +26,8 @@ public class ProgressUIRunner implements Runnable {
     } catch (InterruptedException e) {
       e.printStackTrace();
     } finally {
-      synchronized (parentThread) {
-        parentThread.notify();
+      synchronized (this) {
+        notify();
       }
     }
   }

@@ -26,38 +26,40 @@ public class MouseMove {
       Thread progressThread = null, mouseMoveThread = null, exitThread = null, parentThread = Thread.currentThread();
       if (ArrayUtils.isNotEmpty(args) && ArrayUtils.getLength(args) == 1 && NumberUtils.isParsable(args[0])) {
         System.out.println("Mouse move started with a period gap of " + args[0] + " milliseconds! ... Enter any key followed by return to stop the execution.");
-        progressUIRunner = new ProgressUIRunner(parentThread);
-        mouseMoveRunner = new MouseMoveRunner(NumberUtils.toInt(args[0]), parentThread);
+        progressUIRunner = new ProgressUIRunner();
+        mouseMoveRunner = new MouseMoveRunner(NumberUtils.toInt(args[0]));
         mouseMoveThread = new Thread(mouseMoveRunner);
         progressThread = new Thread(progressUIRunner);
-        exitThread = new Thread(getExitThread(parentThread));
+        exitThread = new Thread(getExitThread(mouseMoveRunner));
         mouseMoveThread.start();
         progressThread.start();
         exitThread.start();
-        synchronized (parentThread) {
-          parentThread.wait();
+
+        mouseMoveThread.join();
+        if (mouseMoveRunner.isFailed()) {
+          exitThread.interrupt();
+          progressUIRunner.stop();
+          throw new RuntimeException("Mouse move failed!");
         }
-        mouseMoveRunner.stop();
         progressUIRunner.stop();
       } else {
         System.out.println("Invalid parameters! Please try again with java -jar <jarname>.jar <milliseconds> or in case of docker then, docker run -tid shankershawn/mousemove <milliseconds>");
         Thread.sleep(2000);
       }
-      System.out.println("Exiting mouse move execution!");
+      System.out.println("Bye bye!!");
     } catch (Exception e) {
       e.printStackTrace();
-      System.exit(-1);
+      System.exit(1);
     }
   }
 
-  private static Runnable getExitThread(final Thread parentThread) {
+  private static Runnable getExitThread(final MouseMoveRunner mouseMoveRunner) {
     return () -> {
       Scanner scanner = new Scanner(System.in);
       if (scanner.hasNext()) {
         scanner.close();
-        synchronized (parentThread) {
-          parentThread.notify();
-        }
+        mouseMoveRunner.stop();
+        System.out.println("Exiting mouse move execution!");
       }
     };
   }
